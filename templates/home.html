@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Home</title>
+
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <header class="navbar">
+        <div class="site-title">Pixel Hub</div>
+        <nav>
+            <a href="/home?user={{ username }}&role={{ role }}" class="active">Home</a>
+            {% if role == 'Admin' %}
+            <a href="/adminhome?user={{ username }}&role={{ role }}">Admin home</a>
+            {% endif %}
+            <a href="/logout">Logout</a>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        
+        <section class="feed">
+            <form action="/create_post?user={{ username }}&role={{ role }}" method="POST" class="post-editor">
+                <textarea name="content" placeholder="What's on your mind?"></textarea>
+                <button type="submit">Post Update</button>
+            </form>
+            
+
+
+            {% for post in posts %}
+            <article class="post">
+                <div class="post-header">
+                    {{ post['username'] }} - 
+                    <span class="post-time">{{ post['timestamp'] }}</span>
+                    
+                    {% if post['username'] == username or role == 'Admin' %}
+                    <form action="/delete_post?user={{ username }}&role={{ role }}" method="POST" style="display:inline; float:right;">
+                        <input type="hidden" name="post_id" value="{{ post['id'] }}">
+                        <button type="submit" style="background: none; border: none; color: #ff4d4d; cursor: pointer; font-size: 0.8rem;">Delete</button>
+                    </form>
+                    {% endif %}
+                </div>
+                <p>{{ post['content'] }}</p>
+                
+      
+
+            </article>
+            {% endfor %}
+        </section>
+        
+    </main>
+</body>
+</html>
