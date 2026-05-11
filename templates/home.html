@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Social Media Home</title>
+    <title>Community Central</title>
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
@@ -42,22 +42,29 @@
                 <button type="submit">Post Update</button>
             </form>
 
+           
             {% for post in posts %}
             <article class="post">
                 <div class="post-header">
-                    {{ post['username'] }} - 
-                    <span class="post-time">{{ post['timestamp'] }}</span>
+                    <div class="user-info">
+                        <span class="username">{{ post['username'] }}</span>
+                        <span class="timestamp">• {{ post['timestamp'] }}</span>
+                    </div>
                     
                     {% if post['username'] == username or role == 'Admin' %}
-                    <form action="/delete_post?user={{ username }}&role={{ role }}" method="POST" style="display:inline; float:right;">
+                    <form action="/delete_post?user={{ username }}&role={{ role }}" method="POST" class="delete-form">
                         <input type="hidden" name="post_id" value="{{ post['id'] }}">
                         <button type="submit" class="delete-btn">Delete</button>
                     </form>
                     {% endif %}
                 </div>
-                <p>{{ post['content'] }}</p>
+                
+                <div class="post-content">
+                    <p>{{ post['content'] }}</p>
+                </div>
             </article>
             {% endfor %}
+
         </section>
     </main>
 </body>

@@ -145,23 +145,45 @@ h2 {
 }
 
 .post {
-    background-color: #535050;
-    padding: 1rem;
-    border-radius: 8px;
-    margin-bottom: 20px; 
+    background: #3a3a3a; 
+    border-left: 4px solid #007bff;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
 .post-header {
-    margin-bottom: 10px;
-    font-weight: bold;
-    font-size: 0.9rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #4a4a4a;
+    padding-bottom: 10px;
 }
 
-.post-time {
-    font-weight: normal;
-    color: #bbb;
-    font-size: 0.8rem;
+.username {
+    color: #4dabff;
+    font-weight: bold;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
 }
+
+
+.timestamp {
+    color: #999;
+    font-size: 0.85rem;
+    margin-left: 8px;
+}
+
+.post p {
+    line-height: 1.6;
+    color: #e0e0e0;
+    font-size: 1rem;
+    margin: 0;
+}
+
+
 
 .delete-btn {
     background: none; 
@@ -169,7 +191,10 @@ h2 {
     color: #ff4d4d; 
     cursor: pointer; 
     font-size: 0.8rem;
+    width: auto; 
+    margin: 0;    
 }
+
 
 
 body.login-page {
