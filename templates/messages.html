@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages - Community Organiser</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+   
+    <input type="checkbox" id="nav-toggle" class="nav-toggle">
+    <label for="nav-toggle" class="nav-toggle-label">
+        <span></span>
+    </label>
+
+
+    <aside class="sidebar">
+        <div class="site-title">Pixel Hub</div>
+        <nav>
+            <a href="/home?user={{ user }}&role={{ role }}">Home</a>
+            <a href="/messages?user={{ user }}&role={{ role }}" class="active">Messages</a>
+            {% if role == 'Admin' %}
+                <a href="/adminhome?user={{ user }}&role={{ role }}">Admin Home</a>
+            {% endif %}
+            <div class="admin-divider">Session</div>
+            <div class="sidebar-footer">
+                <a href="/logout" style="color: #ff4d4d;">Logout</a>
+            </div>
+        </nav>
+    </aside>
+
+  
+    <main class="main-content chat-workspace">
+        
+
+        <section class="chat-sidebar">
+            <div class="chat-sidebar-header">
+                <h3>Direct Messages</h3>
+            </div>
+            
+
+            <form action="/messages/new" method="GET" class="new-chat-form">
+                <input type="hidden" name="user" value="{{ user }}">
+                <input type="hidden" name="role" value="{{ role }}">
+                <input type="text" name="recipient" placeholder="Type username to message..." required>
+                <button type="submit" class="msg-send-btn">Go</button>
+            </form>
+
+            <div class="conversation-list">
+
+                {% for chat in conversations %}
+                <a href="/messages?user={{ user }}&role={{ role }}&chat_with={{ chat.username }}" 
+                   class="conversation-item {% if active_chat == chat.username %}active-chat{% endif %}">
+                    <div class="convo-details">
+                        <span class="convo-username">{{ chat.username }}</span>
+                        <p class="convo-preview">{{ chat.last_message }}</p>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </section>
+
+
+        <section class="chat-window">
+            {% if active_chat %}
+
+                <div class="chat-header">
+                    <span class="username">@{{ active_chat }}</span>
+                </div>
+
+
+                <div class="chat-history" id="chatHistory">
+                    {% for msg in message_history %}
+                        <div class="message-bubble {% if msg.sender == user %}sent{% else %}received{% endif %}">
+                            <div class="bubble-content">
+                                <p>{{ msg.body }}</p>
+                                <span class="chat-timestamp">{{ msg.timestamp }}</span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+
+                <div class="chat-footer">
+                    <form action="/messages/send?user={{ user }}&role={{ role }}&chat_with={{ active_chat }}" method="POST">
+                        <input type="text" name="message_body" placeholder="Type a message..." autocomplete="off" required>
+                        <button type="submit" class="msg-send-btn">Send</button>
+                    </form>
+                </div>
+            {% else %}
+
+                <div class="chat-empty-state">
+                    <div class="empty-icon"></div>
+                    <h3>Your Inbox</h3>
+                    <p>Select an existing conversation or search for a user above to start chatting.</p>
+                </div>
+            {% endif %}
+        </section>
+
+    </main>
+
+
+    <script>
+        const chatHistory = document.getElementById('chatHistory');
+        if (chatHistory) {
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+    </script>
+</body>
+</html>

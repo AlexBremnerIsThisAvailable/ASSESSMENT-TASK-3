@@ -3,6 +3,8 @@ import sqlite3
 import os
 from waitress import serve
 
+
+
 app = Flask(__name__)
 app.secret_key = os.urandom(24) 
 
@@ -10,7 +12,7 @@ DATABASE_FILE = 'LoginData.db'
 
 def get_posts():
     conn = sqlite3.connect(DATABASE_FILE)
-    conn.row_factory = sqlite3.Row 
+    conn.row_factory = sqlite3.Row
     posts = conn.execute("SELECT * FROM POSTS ORDER BY timestamp DESC").fetchall()
     conn.close()
     return posts
@@ -54,7 +56,8 @@ def home():
     if not username: return redirect(url_for('login'))
 
     posts = get_posts() 
-    return render_template('home.html', username=username, posts=posts, role=role)
+    
+    return render_template('home.html', user=username, username=username, posts=posts, role=role)
 
 @app.route('/logout')
 def logout():
@@ -147,9 +150,91 @@ def admin_delete_account():
     conn.close()
     return redirect(f'/adminhome?user={user}&role={role}')
 
+
+
+
+@app.route('/messages')
+def messages():
+    username = request.args.get('user')
+    role = request.args.get('role')
+    chat_with = request.args.get('chat_with')
+    if not username: return redirect(url_for('login'))
+
+    conn = sqlite3.connect(DATABASE_FILE)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+  
+    conversations_raw = cursor.execute("""
+        SELECT DISTINCT CASE WHEN sender = ? THEN receiver ELSE sender END AS convo_user 
+        FROM MESSAGES WHERE sender = ? OR receiver = ?
+    """, (username, username, username)).fetchall()
+
+    conversations = []
+    for row in conversations_raw:
+        convo_partner = row['convo_user']
+   
+        last_msg = cursor.execute("""
+            SELECT body FROM MESSAGES 
+            WHERE (sender = ? AND receiver = ?) OR (sender = ? AND receiver = ?) 
+            ORDER BY timestamp DESC LIMIT 1
+        """, (username, convo_partner, convo_partner, username)).fetchone()
+
+        conversations.append({
+            'username': convo_partner,
+            'last_message': last_msg['body'] if last_msg else ""
+        })
+
+
+    message_history = []
+    if chat_with:
+        message_history = cursor.execute("""
+            SELECT sender, receiver, body, timestamp FROM MESSAGES 
+            WHERE (sender = ? AND receiver = ?) OR (sender = ? AND receiver = ?) 
+            ORDER BY timestamp ASC
+        """, (username, chat_with, chat_with, username)).fetchall()
+
+    conn.close()
+    return render_template('messages.html', user=username, username=username, role=role, 
+                           conversations=conversations, active_chat=chat_with, message_history=message_history)
+
+@app.route('/messages/new')
+def new_message():
+    username = request.args.get('user')
+    role = request.args.get('role')
+    recipient = request.args.get('recipient')
+    if not username: return redirect(url_for('login'))
+
+    conn = sqlite3.connect(DATABASE_FILE)
+    cursor = conn.cursor()
+
+    user_exists = cursor.execute("SELECT 1 FROM USERS WHERE Username = ?", (recipient,)).fetchone()
+    conn.close()
+
+    if user_exists and recipient != username:
+        return redirect(f'/messages?user={username}&role={role}&chat_with={recipient}')
+    
+    return redirect(f'/messages?user={username}&role={role}')
+
+@app.route('/messages/send', methods=['POST'])
+def send_message():
+    username = request.args.get('user')
+    role = request.args.get('role')
+    chat_with = request.args.get('chat_with')
+    message_body = request.form.get('message_body')
+
+    if message_body and username and chat_with:
+        conn = sqlite3.connect(DATABASE_FILE)
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO MESSAGES (sender, receiver, body) VALUES (?, ?, ?)", 
+                       (username, chat_with, message_body))
+        conn.commit()
+        conn.close()
+
+    return redirect(f'/messages?user={username}&role={role}&chat_with={chat_with}')
+
+
 if __name__ == '__main__':
     app.run(debug=True)
-
-
 
    # serve(app, host="0.0.0.0", port=8000)

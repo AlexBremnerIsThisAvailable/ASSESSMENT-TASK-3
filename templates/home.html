@@ -3,30 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Community Central</title>
+    <title>Community Centre</title>
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
    
     <input type="checkbox" id="nav-toggle" class="nav-toggle">
     
-  
     <label for="nav-toggle" class="nav-toggle-label">
         <span></span>
     </label>
 
-
     <aside class="sidebar">
-        <div class="site-title">Community Central</div>
+
+        <div class="site-title">Community Centre</div>
         <nav>
-            <a href="/home?user={{ username }}&role={{ role }}" class="active">Home</a>
-            <a href="/groups?user={{ username }}&role={{ role }}">Groups</a>
-            <a href="/messages?user={{ username }}&role={{ role }}">Direct Messages</a>
-            <a href="/settings?user={{ username }}&role={{ role }}">Settings</a>
+            <a href="/home?user={{ user }}&role={{ role }}" class="active">Home</a>
+            <a href="/groups?user={{ user }}&role={{ role }}">Groups</a>
+            <a href="/messages?user={{ user }}&role={{ role }}">Messages</a>
+            <a href="/settings?user={{ user }}&role={{ role }}">Settings</a>
             
             {% if role == 'Admin' %}
             <div class="admin-divider">Admin Controls</div>
-            <a href="/adminhome?user={{ username }}&role={{ role }}">Admin Control</a>
+            <a href="/adminhome?user={{ user }}&role={{ role }}">Admin Control</a>
             {% endif %}
             
             <div class="sidebar-footer">
@@ -37,12 +36,11 @@
 
     <main class="main-content">
         <section class="feed">
-            <form action="/create_post?user={{ username }}&role={{ role }}" method="POST" class="post-editor">
-                <textarea name="content" placeholder="What's on your mind?"></textarea>
+            <form action="/create_post?user={{ user }}&role={{ role }}" method="POST" class="post-editor">
+                <textarea name="content" placeholder="What's on your mind?" required></textarea>
                 <button type="submit">Post Update</button>
             </form>
 
-           
             {% for post in posts %}
             <article class="post">
                 <div class="post-header">
@@ -51,8 +49,8 @@
                         <span class="timestamp">• {{ post['timestamp'] }}</span>
                     </div>
                     
-                    {% if post['username'] == username or role == 'Admin' %}
-                    <form action="/delete_post?user={{ username }}&role={{ role }}" method="POST" class="delete-form">
+                    {% if post['username'] == user or role == 'Admin' %}
+                    <form action="/delete_post?user={{ user }}&role={{ role }}" method="POST" class="delete-form" style="margin:0; display:inline;">
                         <input type="hidden" name="post_id" value="{{ post['id'] }}">
                         <button type="submit" class="delete-btn">Delete</button>
                     </form>

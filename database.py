@@ -20,6 +20,18 @@ cmd3 = """ CREATE TABLE IF NOT EXISTS POSTS (
 cursor.execute(cmd3)
 
 
+cmd5 = """ CREATE TABLE IF NOT EXISTS MESSAGES (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    sender TEXT NOT NULL,
+    receiver TEXT NOT NULL,
+    body TEXT NOT NULL,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+) """
+cursor.execute(cmd5)
+
+
+
+
 cmd2 = """ INSERT OR IGNORE INTO USERS (Username, password, role) values (?, ?, ?) """
 cursor.execute(cmd2, ('tester', 'tester1', 'User')) 
 

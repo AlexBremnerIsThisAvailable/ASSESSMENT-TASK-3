@@ -3,46 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Home</title>
+    <title>Admin Controls - Community Centre</title>
     <link rel="stylesheet" href="/static/styles.css">
-
 </head>
 <body>
-    <header class="navbar">
-        <div class="site-title">Pixel Hub</div>
+
+    <input type="checkbox" id="nav-toggle" class="nav-toggle">
+    <label for="nav-toggle" class="nav-toggle-label">
+        <span></span>
+    </label>
+
+
+    <aside class="sidebar">
+        <div class="site-title">Community Centre</div>
         <nav>
-
             <a href="/home?user={{ user }}&role={{ role }}">Home</a>
-
-            <a href="/adminhome?user={{ user }}&role={{ role }}" class="active">Admin Home</a>
-            <a href="/logout">Logout</a>
+            <a href="/groups?user={{ user }}&role={{ role }}">Groups</a>
+            <a href="/messages?user={{ user }}&role={{ role }}">Messages</a>
+            <a href="/settings?user={{ user }}&role={{ role }}">Settings</a>
+            
+            {% if role == 'Admin' %}
+            <div class="admin-divider">Admin Controls</div>
+            <a href="/adminhome?user={{ user }}&role={{ role }}" class="active">Admin Control</a>
+            {% endif %}
+            
+            <div class="sidebar-footer">
+                <a href="/logout">Logout</a>
+            </div>
         </nav>
-    </header>
+    </aside>
+
 
     <main class="main-content">
-        <section class="feed" style="flex-basis: 100%;">
-            <h2>User Management (Admin Only)</h2>
-            <div class="user-list">
+        <section class="feed" style="max-width: 900px; margin: 0 auto;">
+            <div class="admin-header-block">
+                <h2 class="admin-main-title">User Management Portal</h2>
+                <p class="admin-subtitle">Review status roles, manage access rights, or remove platform accounts.</p>
+            </div>
+
+            <div class="user-list-container">
                 {% for user_record in users %}
-                <div class="user-row">
-                    <span><strong>{{ user_record['Username'] }}</strong> (Role: {{ user_record['role'] }})</span>
-                    <div class="user-actions">
-                   
-                        <form action="/admin_change_role?user={{ user }}&role={{ role }}" method="POST">
+                <div class="admin-user-card">
+                
+                    <div class="admin-user-info">
+                        <span class="admin-username">@{{ user_record['Username'] }}</span>
+                        <div class="role-badge-row">
+                            <span class="role-badge {% if user_record['role'] == 'Admin' %}badge-admin{% else %}badge-user{% endif %}">
+                                {{ user_record['role'] }}
+                            </span>
+                        </div>
+                    </div>
+                    
+        
+                    <div class="admin-actions-group">
+                  
+                        <form action="/admin_change_role?user={{ user }}&role={{ role }}" method="POST" class="inline-admin-form">
                             <input type="hidden" name="username" value="{{ user_record['Username'] }}">
                             {% if user_record['role'] == 'User' %}
                                 <input type="hidden" name="new_role" value="Admin">
-                                <button type="submit">Make Admin</button>
+                                <button type="submit" class="admin-btn secondary-btn">Make Admin</button>
                             {% else %}
                                 <input type="hidden" name="new_role" value="User">
-                                <button type="submit">Make User</button>
+                                <button type="submit" class="admin-btn secondary-btn">Make User</button>
                             {% endif %}
                         </form>
                         
-                        <form action="/admin_delete_account?user={{ user }}&role={{ role }}" method="POST" onsubmit="return confirm('Are you sure you want to delete {{ user_record.Username }}?');">
-                            
+              
+                        <form action="/admin_delete_account?user={{ user }}&role={{ role }}" method="POST" class="inline-admin-form" 
+                              onsubmit="return confirm('Are you sure you want to completely delete the account for {{ user_record.Username }}? This action cannot be reversed.');">
                             <input type="hidden" name="username" value="{{ user_record['Username'] }}">
-                            <button type="submit" style="background-color: #ff4d4d;">Delete Account</button>
+                            <button type="submit" class="admin-btn danger-btn">Delete Account</button>
                         </form>
                     </div>
                 </div>
